@@ -1,3 +1,7 @@
+h1. About fork
+
+This is a for of original mail_style gem to add new rails 3 action mailer support. Works only with Rails 3.
+
 h1. MailStyle
 
 MailStyle tries to make sending HTML emails a little less painful.
