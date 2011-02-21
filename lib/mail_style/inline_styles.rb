@@ -6,9 +6,19 @@ module MailStyle
   module InlineStyles
     DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
 
+    def self.included(receiver)
+      receiver.send :include, InstanceMethods
+      receiver.class_eval do
+        # adv_attr_accessor :css
+        alias_method_chain :mail, :inline_styles
+      end
+    end
+
     module InstanceMethods
-      def mail_with_inline_styles(options = {})
-        m = mail_without_inline_styles(options)
+      def mail_with_inline_styles(options = {}, &block)
+        @inline_style_css_targets = headers[:css]
+
+        m = mail_without_inline_styles(options, &block)
         write_inline_styles(m)
         m
       end
@@ -174,36 +184,28 @@ module MailStyle
       def css_parser
         parser = CssParser::Parser.new
 
-        parser.add_block!(css_rules) if @css.present?
+        parser.add_block!(css_rules) if @inline_style_css_targets.present?
         parser.add_block!(@inline_rules)
         parser
       end
 
       # Css Rules
       def css_rules
-        if @css.is_a?(Array)
-          @css.collect{|r| File.read(css_file(r)) }.join("\n")
+        if @inline_style_css_targets.is_a?(Array)
+          @inline_style_css_targets.collect{ |r| File.read(css_file(r)) }.join("\n")
         else
-          File.read css_file(@css)
+          File.read css_file(@inline_style_css_targets)
         end
       end
 
       # Find the css file
-      def css_file(name=nil)
+      def css_file(name = nil)
         if name.present?
           css = name.to_s
           css = css[/\.css$/] ? css : "#{css}.css"
           path = File.join(Rails.root, 'public', 'stylesheets', css)
           File.exist?(path) ? path : raise(CSSFileNotFound)
         end
-      end
-    end
-
-    def self.included(receiver)
-      receiver.send :include, InstanceMethods
-      receiver.class_eval do
-        adv_attr_accessor :css
-        alias_method_chain :mail, :inline_styles
       end
     end
   end
