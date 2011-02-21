@@ -9,14 +9,13 @@ module MailStyle
     def self.included(receiver)
       receiver.send :include, InstanceMethods
       receiver.class_eval do
-        # adv_attr_accessor :css
         alias_method_chain :mail, :inline_styles
       end
     end
 
     module InstanceMethods
       def mail_with_inline_styles(options = {}, &block)
-        @inline_style_css_targets = headers[:css]
+        @inline_style_css_targets = options[:css]
 
         m = mail_without_inline_styles(options, &block)
         write_inline_styles(m)
@@ -177,25 +176,20 @@ module MailStyle
         end
 
         url.to_s
-
       end
 
       # Css Parser
       def css_parser
         parser = CssParser::Parser.new
 
-        parser.add_block!(css_rules) if @inline_style_css_targets.present?
+        parser.add_block!(css_rules) unless css_targets.blank?
         parser.add_block!(@inline_rules)
         parser
       end
 
       # Css Rules
       def css_rules
-        if @inline_style_css_targets.is_a?(Array)
-          @inline_style_css_targets.collect{ |r| File.read(css_file(r)) }.join("\n")
-        else
-          File.read css_file(@inline_style_css_targets)
-        end
+        css_targets.collect{ |r| File.read(css_file(r)) }.join("\n")
       end
 
       # Find the css file
@@ -206,6 +200,10 @@ module MailStyle
           path = File.join(Rails.root, 'public', 'stylesheets', css)
           File.exist?(path) ? path : raise(CSSFileNotFound)
         end
+      end
+
+      def css_targets
+        Array(@inline_style_css_targets || self.class.default[:css] || []).map { |target| target.to_s }
       end
     end
   end
