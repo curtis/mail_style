@@ -193,7 +193,7 @@ module MailStyle
         if name.present?
           css = name.to_s
           css = css[/\.css$/] ? css : "#{css}.css"
-          path = File.join(RAILS_ROOT, 'public', 'stylesheets', css)
+          path = File.join(Rails.root, 'public', 'stylesheets', css)
           File.exist?(path) ? path : raise(CSSFileNotFound)
         end
       end
