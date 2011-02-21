@@ -7,9 +7,10 @@ module MailStyle
     DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
 
     module InstanceMethods
-      def create_mail_with_inline_styles
-        write_inline_styles
-        create_mail_without_inline_styles
+      def mail_with_inline_styles(options = {})
+        m = mail_without_inline_styles(options)
+        write_inline_styles(m)
+        m
       end
 
       protected
@@ -20,23 +21,23 @@ module MailStyle
         [parts, nested].flatten
       end
 
-      def write_inline_styles
-        parts = collect_parts(@parts)
+      def write_inline_styles(mail)
+        parts = collect_parts(mail.parts)
 
         # Parse only text/html parts
-        parsable_parts(@parts).each do |part|
-          part.body = parse_html(part.body)
+        parsable_parts(parts).each do |part|
+          part.body.instance_variable_set("@raw_source", parse_html(part.body.raw_source))
         end
 
         # Parse single part emails if the body is html
-        real_content_type, ctype_attrs = parse_content_type
-        self.body = parse_html(body) if body.is_a?(String) && real_content_type == 'text/html'
+        # real_content_type, ctype_attrs = parse_content_type
+        # self.body = parse_html(body) if body.is_a?(String) && real_content_type == 'text/html'
       end
       
       def parsable_parts(parts)
         selected = []
         parts.each do |part|
-          selected << part if part.content_type == 'text/html'
+          selected << part if part.content_type =~ /text\/html/
           selected += parsable_parts(part.parts)
         end
         selected
@@ -202,10 +203,8 @@ module MailStyle
       receiver.send :include, InstanceMethods
       receiver.class_eval do
         adv_attr_accessor :css
-        alias_method_chain :create_mail, :inline_styles
+        alias_method_chain :mail, :inline_styles
       end
     end
   end
 end
-
-ActionMailer::Base.send :include, MailStyle::InlineStyles
