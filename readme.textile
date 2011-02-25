@@ -1,61 +1,36 @@
 h1. About fork
 
 This is a for of original mail_style gem to add new rails 3 action mailer support. Works only with Rails 3.
-
-h1. MailStyle
-
-MailStyle tries to make sending HTML emails a little less painful.
-
-For a more in depth introduction check out the "Blog Post":http://blog.purifyapp.com/2009/12/30/mailstyle-a-html-email-plugin-for-ruby-on-rails/
-
-It was developed for use on "Purify: Awesome Bug & Issue Tracking":http://purifyapp.com
+For original gem look at http://github.com/purify/mail_style
 
 h2. Install
 
-First install the dependencies:
-
-<pre><code>sudo gem install nokogiri css_parser</code></pre>
-
-Then install MailStyle to your rails app, either as a plugin:
-
-<pre><code>script/plugin install http://github.com/purify/mail_style</code></pre>
-
-Or you can install the gem:
-
-<pre><code># Install gemcutter if you haven't already
-sudo gem install gemcutter
-sudo gem tumble
-
-# Install MailStyle
-sudo gem install mail_style</code></pre>
-
-Then in your <code>environment.rb</code> file add:
-
-<pre><code>config.gem "mail_style"</code></pre>
+Add to your Gemfile
+<pre><code>gem 'mail_style', :git => 'git://github.com/uzzz/mail_style.git'</code></pre>
 
 h2. Usage
 
-Simply add the <code>css</code> method to your deliver actions:
+Simply add the <code>css</code> parameter to mail method:
 
 <pre><code>class Notifier < ActionMailer::Base
   def welcome_email
-    css :email
+    mail(:subject => 'Welcome Abroad', :from => 'jimneath@googlemail.com', :to => 'recipient@example.com', :css => 'email')
+  end
+</code></pre>
 
-    subject 'Welcome Aboard'
-    recipients 'someone@example.com'
-    from 'jimneath@googlemail.com'
-    sent_on Time.now
+or to defaults hash
+
+<pre><code>class Notifier < ActionMailer::Base
+  default :css => 'email'
+
+  def welcome_email
+    ...
   end
 
-  def newsletter_email
-    css [:email,:newsletter]
-
-    subject 'Newsletter'
-    recipients 'someone@example.com'
-    from 'jimneath@googlemail.com'
-    sent_on Time.now
+  def digest_email
+    ...
   end
-end</code></pre>
+</code></pre>
 
 This will look for a css file called _email.css_ in your _public/stylesheets_ folder. The <code>css</code> method can take either a string or a symbol. You can also pass the css file name with or without the .css extension.
 
