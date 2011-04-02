@@ -4,7 +4,7 @@ require 'css_parser'
 
 module MailStyle
   module InlineStyles
-    DOCTYPE = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">'
+    DOCTYPE = '<!DOCTYPE html>'
 
     def self.included(receiver)
       receiver.send :include, InstanceMethods
@@ -113,10 +113,6 @@ module MailStyle
         # Add doctype to html along with body
         document = Nokogiri::HTML.parse(DOCTYPE + body)
 
-        # Set some meta stuff
-        html = document.at_css('html')
-        html['xmlns'] = 'http://www.w3.org/1999/xhtml'
-
         # Create <head> element if missing
         head = document.at_css('head')
 
@@ -127,8 +123,7 @@ module MailStyle
 
         # Add utf-8 content type meta tag
         meta = Nokogiri::XML::Node.new('meta', document)
-        meta['http-equiv'] = 'Content-Type'
-        meta['content'] = 'text/html; charset=utf-8'
+        meta['charset'] = 'utf-8'
         head.add_child(meta)
 
         # Grab all the styles that are inside <style> elements already in the document
@@ -197,7 +192,7 @@ module MailStyle
         if name.present?
           css = name.to_s
           css = css[/\.css$/] ? css : "#{css}.css"
-          path = File.join(Rails.root, 'public', 'stylesheets', css)
+          path = Rails.root.join('public', 'stylesheets', css)
           File.exist?(path) ? path : raise(CSSFileNotFound)
         end
       end

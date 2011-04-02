@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Jim Neath"]
-  s.date = %q{2011-02-24}
+  s.date = %q{2011-04-01}
   s.description = %q{Making HTML emails a little less painful. Writes css inline and corrects image urls.}
   s.email = %q{jimneath@googlemail.com}
   s.extra_rdoc_files = [
@@ -36,7 +36,7 @@ Gem::Specification.new do |s|
   ]
   s.homepage = %q{http://github.com/purify/mail_style}
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.6}
+  s.rubygems_version = %q{1.3.7}
   s.summary = %q{Making HTML emails a little less painful. Writes css inline and corrects image urls.}
   s.test_files = [
     "spec/inline_styles_spec.rb",
@@ -47,7 +47,7 @@ Gem::Specification.new do |s|
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<actionmailer>, [">= 1.2.3"])
       s.add_runtime_dependency(%q<nokogiri>, [">= 1.0.0"])
       s.add_runtime_dependency(%q<css_parser>, [">= 1.0.0"])
